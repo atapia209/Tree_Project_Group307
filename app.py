@@ -1,68 +1,68 @@
-from flask import Flask, jsonify, request, session
+from flask import Flask, jsonify, render_template, request, session
 from flask_cors import CORS, cross_origin
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 CORS(app)
 
-app.config['SQLALCHEMY_DATABSE_URI'] = 'postgresql+psycopg2://admin:password@localhost/virtualfarm'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.secret_key = 'UCMBOB307'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Accel_54@localhost/virtualOrchard'
+
 db = SQLAlchemy(app)
 
-#class Tree(db.Model):
+class trees(db.Model):
 
-#    __tablename__ = 'tree_specifications'
-#    id = db.Column(db.Integer, primary_key = True)
-#    tree_type = db.Column(db.Integer, nullable = False)
-#   tree_width = db.Column(db.Integer, nullable = False)
+    __tablename__ = 'trees'
+    id = db.Column(db.Integer(), primary_key = True)
+    width = db.Column(db.Integer(), nullable = False, default = 0)
     #Geolocation
 
-#    def __repr__(self):
+    def __init__(self, id, width):
+        self.id = id
+        self.width = width
 #        return "<Tree %r>" % self.id
+
+db.create_all()
 
 @app.route('/')
 def home():
-    return "Front Page!"
+    return render_template("login.html")
+
+@app.route('/upload')
+def upload():
+    return render_template("upload.html")
+
+@app.route('/test')
+def test():
+    return {
+        'test': 'test'
+    }
 
 #@cross_origin()
-#@app.route('/data', methods = ['POST'])
-#def create_tree():
+@app.route('/trees', methods = ['GET'])
+def gtree():
 
-#    tree_data = request.json
+    tree_spec = trees.query.all()
+    all_trees = []
 
-#    tree_type = tree_data['tree_type']
-#    tree_width = tree_data['tree_width']
+    for tree in tree_spec:
+        current_tree = {}
+        current_tree['id'] = tree.id
+        current_tree['width'] = tree.width
+        all_trees.append(current_tree)
 
-#    tree = Tree(tree_type = tree_type, tree_width = tree_width)
-#    db.session.add(tree)
-#    db.session.commit()
-
-#    return jsonify({"success": True,"response":"Tree added"})
+    return jsonify(all_trees)
 
 #@cross_origin()
-#@app.route('/getdata', methods = ['GET'])
-#def get_tree():
+@app.route('/trees', methods = ['POST'])
+def ctree():
 
-#    all_trees = []
-#    tree_specifications = Tree.query.all()
+    tree_data = request.get_json()
+    tree = trees(id = tree_data['id'], width = tree_data['width'])
+    db.session.add(tree)
+    db.session.commit()
 
-#    for tree in tree_specifications:
-#        results = {
-#            "id":tree.id,
-#            "tree_type":tree.tree_type,
-#            "tree_width":tree.tree_width
-#        }
-#        all_trees.append(results)
-
-#    return jsonify(
-#        {
-#            "success": True,
-#            "tree_specifications": all_trees,
-#            "total_trees": len(tree_specifications)
-#        }
-#    )
+    return jsonify(tree_data)
 
 if __name__ == '__main__':
-#    db.create_all()
     app.run(debug=True)
