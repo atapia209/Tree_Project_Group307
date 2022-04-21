@@ -6,14 +6,18 @@
 <body> 
     <h1>Nursery Web App</h1>
 
+    <button type="upload"> <a href="{{url_for('load')}}">Upload </a></button>
+
+    <form method="post" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <input type="submit" value="Upload">
+    </form>
+
+    <h2> Create a new project</h2>
+    <p>Create a new virtual farm </p>
+    <a href="{{url_for('logout')}}">Logout</a>
+
 </body>
-
-<button type="upload"> <a href="{{url_for('load')}}">Upload </a></button>
-<h2> Create a new project</h2>
-<p>Create a new virtual farm </p>
-<a href="{{url_for('logout')}}">Logout</a>
-
-
 
 
 </html>
