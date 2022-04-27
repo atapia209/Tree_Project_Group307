@@ -1,3 +1,4 @@
+from concurrent.futures import process
 import json
 import cv2
 from sys import argv
@@ -36,12 +37,14 @@ def cropImage(image, bounding_box, width, height):
   end_point = (int(start_point[0] + bounding_box["Width"] * width), int(start_point[1] + bounding_box["Height"] * height))
   return image[start_point[1]:end_point[1], start_point[0]:end_point[0]]
 
-if __name__ == "__main__": # TODO 
-  with open(argv[1], "r") as aws_output_file:
+
+def processJSON(json_path, video_path, name = "", counter = 0):
+  with open(json_path, "r") as aws_output_file:
     aws_output = json.load(aws_output_file)
 
-
-  video_path = argv[2]
+  if(len(name) == 0):
+    name = video_path
+  
   vid_obj = cv2.VideoCapture(video_path)
   frames = []
 
@@ -64,14 +67,30 @@ if __name__ == "__main__": # TODO
     # Add the image to our list of images
     frames.append(still)
 
+  handleImages(frames, "./images", name, counter)
 
-
-  for i, frame in enumerate(frames):
+  # Returns this so if we're processing multiple videos for the same portion we can keep the counter/name consistent between them
+  return len(frames)
+  
+def handleImages(imgs, location, name, counter):
+  # print(len(imgs))
+  for i, frame in enumerate(imgs):
     # Pop up window showing the frame
-    cv2.imshow(f"Frame {i}", frames[i])
+    cv2.imshow(f"Frame {i + counter}", imgs[i])
     # Save the frame to images folder
-    # TODO run a regex or something against the video's path so that we can include it in the name of the image, but ensure we don't catch any ../Folder parts
-    cv2.imwrite(f"./images/{video_path}___Frame_{i}.jpg", frames[i])
+    cv2.imwrite(f"{location}/{name}_{i+counter}.jpg", imgs[i])
+
+def processMultiple(json_paths, video_paths, name):
+  counter = 0
+  for i, path in enumerate(json_paths):
+    counter += processJSON(path, video_paths[i], name, counter)
+
+
+if __name__ == "__main__": # TODO 
+  json_paths = argv[1::2]
+  video_paths = argv[2::2]
+  
+  processMultiple(json_paths, video_paths, "TEST")
 
   # wait for any key input
   cv2.waitKey(0)
