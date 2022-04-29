@@ -54,6 +54,7 @@
 .map-title-wrapper {
   border: 1px solid black;
   background-color: lightgray;
+  padding-left: 2em;
 }
 .map-container { 
   /* height: 520px; */
