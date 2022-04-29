@@ -10,6 +10,9 @@ from werkzeug.utils import secure_filename
 from wtforms import PasswordField, StringField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
+
 # Initialize the app
 app = Flask(__name__)
 maindir = os.path.abspath(os.path.dirname(__file__))
@@ -49,6 +52,17 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(32), nullable=False)
+
+class MyModelView(ModelView):
+    def is_accessible(self):
+        return current_user.is_authenticated
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('login'))
+
+# Admin
+admin = Admin(app, name='Admin', template_mode='bootstrap3')
+admin.add_view(ModelView(User, db.session))
 
 class RegisterForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired(), Length(min=4, max=15)])
@@ -172,16 +186,11 @@ def upload():
 
     return render_template('upload.html')
 
-@app.route('/load')
-@login_required
-def load():
-    return render_template('load.html')
-
 #Route for dashboard Uncomment when dashboard is ready
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return "Hello World"
+    return render_template('dashboard.html')
 
 #Run Servers
 if __name__ == '__main__':
