@@ -1,0 +1,121 @@
+body {
+    height: 100%;
+    background: linear-gradient(90deg, #FFFFFF 50%, #B0D6AA 50%);
+}
+
+
+h1{
+position: absolute;
+width: 498px;
+height: 101px;
+left: 113px;
+top: 114px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 400;
+font-size: 48px;
+line-height: 56px;
+text-align: center;
+}
+
+
+label[for= fname]{
+    position: absolute;
+    width: 375px;
+    height: 50px;
+    left: 125px;
+    top: 300px;
+  
+  }
+  
+  input[name = fname] {
+    position: absolute;
+    width: 375px;
+    height: 45px;
+    left: 235px;
+    top: 300px;
+  
+  border-radius: 13px;
+  
+  }
+
+  label[for= lname]{
+    position: absolute;
+    width: 375px;
+    height: 50px;
+    left: 125px;
+    top: 375px;
+  
+  }
+  
+  input[name = lname] {
+    position: absolute;
+    width: 375px;
+    height: 45px;
+    left: 235px;
+    top: 375px;
+  
+  border-radius: 13px;
+  
+  }
+
+
+
+
+
+
+label[for= uname]{
+    position: absolute;
+    width: 375px;
+    height: 50px;
+    left: 125px;
+    top: 465px;
+  
+  }
+  
+  input[name = uname] {
+    position: absolute;
+    width: 375px;
+    height: 45px;
+    left: 235px;
+    top: 450px;
+  
+  border-radius: 13px;
+  
+  }
+  
+  
+  label[for= psw]{
+    position: absolute;
+    width: 375px;
+    height: 50 px;
+    left: 125px;
+    top: 535px;
+  
+  }
+  
+  
+  input[name = psw] {
+      position: absolute;
+      width: 375px;
+      height: 45px;
+      left: 235px;
+      top: 525px;
+  
+      
+      border-radius: 13px;
+  
+  }
+
+  button[type = con]{
+
+    position: absolute;
+    width: 120px;
+    height: 45px;
+    left: 235px;
+    top: 635px;
+       
+  }
+
+
