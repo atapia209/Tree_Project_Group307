@@ -1,23 +1,42 @@
 
 <!doctype html>
+
 <html>
-<link rel="stylesheet" href="/static/css/upload.css">
+    <link rel="stylesheet" href="/static/css/upload.css">
 
-<body> 
-    <h1>Nursery Web App</h1>
+    <body> 
 
-    <button type="upload"> <a href="{{url_for('load')}}">Upload </a></button>
+        <h1>Nursery Web App</h1>
 
-    <form method="post" enctype="multipart/form-data">
-        <input type="file" name="file">
-        <input type="submit" value="Upload">
-    </form>
+        <div id="uploaded-files">
+            <h2>Select .mp4 file(s) to upload</h2>
+            <p>
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                <ul class="flashes">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                    {% endif %}
+                    {% endwith %}
+            </p>
 
-    <h2> Create a new project</h2>
-    <p>Create a new virtual farm </p>
-    <a href="{{url_for('logout')}}">Logout</a>
+            <form method="post" enctype="multipart/form-data">
+                <dl>
+                    <p>
+                        <input type="file" name="files[]" multiple="true"
+                        autocomplete="off" required>
+                    </p>
+                </dl>
+                <p>
+                    <input type="submit" value="Upload">
+                </p>
+            </form>
+        </div>
 
-</body>
+        <a href="{{url_for('logout')}}">Logout</a>
 
+    </body>
 
 </html>

@@ -4,7 +4,7 @@ body {
     background: #B0D6AA 100%;
 }
 
-
+/*
 h1{
     position: absolute;
     width: 498px;
@@ -21,18 +21,6 @@ h1{
     
     color: #000000;
 }
-
-
-button[type = upload]{
-  
-    position: absolute;
-    width: 176px;
-    height: 173px;
-    left: 64px;
-    top: 287px;
-    
-  
-  }
 
   p{
     position: absolute;
@@ -69,3 +57,4 @@ button[type = upload]{
     color: #000000;
     
   }
+*/

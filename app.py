@@ -1,3 +1,4 @@
+from enum import unique
 import os
 
 from flask import (Flask, flash, jsonify, redirect, render_template, request, url_for)
@@ -29,7 +30,7 @@ bcrypt = Bcrypt(app)
 ma = Marshmallow(app)
 
 # Initialze file upload
-upload_folder = os.path.join(maindir, 'static/uploads')
+upload_folder = os.path.join(maindir, '/uploads')
 allowed_extensions = {'mp4'}
 app.config['UPLOAD_FOLDER'] = upload_folder
 
@@ -60,27 +61,6 @@ class MyModelView(ModelView):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('login'))
 
-# Admin
-admin = Admin(app, name='Admin', template_mode='bootstrap3')
-admin.add_view(ModelView(User, db.session))
-
-class RegisterForm(FlaskForm):
-    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=15)])
-    password = PasswordField('Password', validators=[InputRequired(), Length(min=4, max=15)])
-
-    submit = SubmitField('Sign Up')
-
-    def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
-        if user:
-            raise ValidationError('Username already exists')
-
-class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=15)])
-    password = PasswordField('Password', validators=[InputRequired(), Length(min=4, max=15)])
-
-    submit = SubmitField('Sign In')
-
 # Tree Main Model
 class Tree(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -100,6 +80,37 @@ class TreeSchema(ma.Schema):
 
 tree_schema = TreeSchema()
 trees_schema = TreeSchema(many=True)
+
+# File Main Model
+class File(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    filename = db.Column(db.String(30), nullable=False, unique=True)
+
+    def __init__(self, filename):
+        self.filename = filename
+
+# Admin
+admin = Admin(app, name='Admin', template_mode='bootstrap3')
+admin.add_view(MyModelView(User, db.session))
+admin.add_view(MyModelView(Tree, db.session))
+admin.add_view(MyModelView(File, db.session))
+
+class RegisterForm(FlaskForm):
+    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=15)])
+    password = PasswordField('Password', validators=[InputRequired(), Length(min=4, max=15)])
+
+    submit = SubmitField('Sign Up')
+
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user:
+            raise ValidationError('Username already exists')
+
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=15)])
+    password = PasswordField('Password', validators=[InputRequired(), Length(min=4, max=15)])
+
+    submit = SubmitField('Sign In')
 
 @app.route('/trees', methods=['POST'])
 def add_tree():
@@ -165,25 +176,48 @@ def register():
 
     return render_template('login-1.html', form=form)
 
-@app.route('/upload', methods=['GET', 'POST'])
+@app.route('/upload', methods=['GET', 'POST', 'DELETE'])
 @login_required
 def upload():
 
     if request.method == 'POST':
-        if 'file' not in request.files:
+        if 'files[]' not in request.files:
             flash('No file part')
             return redirect(request.url)
-        file = request.files['file']
- 
-        if file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
- 
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return redirect(url_for('upload', filename=filename))
 
+        files = request.files.getlist('files[]')
+
+        # if user selects incorrect file type
+        if files[0].filename.split('.')[1] != 'mp4':
+            flash('Incorrect file type')
+        
+        # if user selects a file that already exists
+        if File.query.filter_by(filename=files[0].filename).first():
+            flash('File already exists')
+            return redirect(request.url)
+
+        for file in files:
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+                # Add file to database
+                new_file = File(filename)
+                db.session.add(new_file)
+                db.session.commit()
+
+                flash('File(s) uploaded successfully')
+            return redirect(url_for('upload'))
+
+        # delete all files
+        if request.method == 'DELETE':
+            for file in files:
+                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
+                db.session.delete(file)
+                db.session.commit()
+            flash('File(s) deleted successfully')
+            return redirect(url_for('upload'))    
+    
     return render_template('upload.html')
 
 #Route for dashboard Uncomment when dashboard is ready
