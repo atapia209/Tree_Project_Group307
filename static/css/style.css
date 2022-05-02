@@ -14,7 +14,6 @@
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
-  margin: 4px 2px;
 }
 
 .tree-logo {
@@ -64,11 +63,14 @@
 .dashboard-table-header {
   border: 1px solid black;
   border-collapse: collapse;
+  font-size: 2em;
 }
 
 .dashboard-table-elem {
   border: 1px solid black;
   border-collapse: collapse;
+  font-size: 1em;
+  padding-left: 1em;
 }
 
 
