@@ -1,4 +1,3 @@
-from enum import unique
 import os
 
 from flask import (Flask, flash, jsonify, redirect, render_template, request, url_for)
@@ -91,6 +90,7 @@ class File(db.Model):
 
 # Admin
 admin = Admin(app, name='Admin', template_mode='bootstrap3')
+MyModelView.can_export = True
 admin.add_view(MyModelView(User, db.session))
 admin.add_view(MyModelView(Tree, db.session))
 admin.add_view(MyModelView(File, db.session))
