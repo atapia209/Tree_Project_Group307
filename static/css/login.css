@@ -1,72 +1,24 @@
-/* Place your CSS styles in this file 
-
-/*
-
-.modal {
-    display: none; /* Hidden by default 
-    position: fixed; /* Stay in place 
-    z-index: 1; /* Sit on top 
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width 
-    height: 100%; /* Full height 
-    overflow: auto; /* Enable scroll if needed 
-    background-color: rgb(0,0,0); /* Fallback color 
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity
-    padding-top: 60px;
-  }
+.left {
+  width: 50vw;
+  height: 100vh;
+  margin-right: 50vw;
+  background-color: #B0D6AA;
   
-
-  .modal-content {
-    background-color: #fefefe;
-    margin: 5px auto; /* 15% from the top and centered 
-    border: 1px solid #888;
-    width: 80%; /* Could be more or less, depending on screen size 
-  }
-  
-  .close {
-    /* Position it in the top right corner outside of the modal 
-    position: absolute;
-    right: 25px;
-    top: 0; 
-    color: #000;
-    font-size: 35px;
-    font-weight: bold;
-  }
-  
-
-  .close:hover,
-  .close:focus {
-    color: red;
-    cursor: pointer;
-  }
-  
- 
-  
-  @-webkit-keyframes animatezoom {
-    from {-webkit-transform: scale(0)} 
-    to {-webkit-transform: scale(1)}
-  }
-  
-  @keyframes animatezoom {
-    from {transform: scale(0)} 
-    to {transform: scale(1)}
-  }
-  */ 
-
-  body {
-    height: 100%;
-    background: linear-gradient(90deg, #FFFFFF 50%, #B0D6AA 50%);
+  display:flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
 }
 
-h1{
-  position: absolute;
-  width: 498px;
-  height: 101px;
-  left: 105px;
-  top: 260px;
-  
-  font-family: 'Roboto';
+body {
+  height: 100%;
+  background: #FFFFFF;
+  margin: 0;
+  padding: 0;
+}
+
+.title {
+  font-family: sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 48px;
@@ -74,76 +26,71 @@ h1{
   text-align: center;
   
   color: #000000;
+  margin-right: 30px;
+}
+
+.title-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.logo {
+  height: 75px;
+  width: 75px;
+}
+
+.input-boxes {
+  display: flex;
+  flex-direction: column;
+  width: 30ch;
+}
+
+.input-rows {
+  display: flex;
+  flex-direction: column;
+  margin: 5px;
+}
+
+.login-boxes {
+  padding: 5px;
+  border-radius: 15px;
+}
+.login {
+  margin-top: 15px;
+}
+
+.new-user {
+  background-color:#d4d2b1;
+  border: none;
+  color: black;
+  padding: 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin-top: 50px;
+}
+
+.new-user:hover {
+  background-color: #a9a88d;
 }
 
 
-label[for= uname]{
-  position: absolute;
-  width: 375px;
-  height: 50px;
-  left: 125px;
-  top: 465px;
-
-}
-
-input[name = uname] {
-  position: absolute;
-  width: 375px;
-  height: 45px;
-  left: 235px;
-  top: 450px;
-
-border-radius: 13px;
-
-}
 
 
-label[for= psw]{
-  position: absolute;
-  width: 375px;
-  height: 50 px;
-  left: 125px;
-  top: 535px;
+@media (orientation: portrait) {
+  .left {
+    width: 100vw;
+    margin-right: 0;
+  }
 
-}
+  .login-boxes, .input-boxes {
+    height: 3em;
+    width: 50ch;
+  }
 
-
-input[name = psw] {
-    position: absolute;
-    width: 375px;
-    height: 45px;
-    left: 235px;
-    top: 525px;
-
-    
-    border-radius: 13px;
-
-}
-
-
-button[type = login]{
-
-  position: absolute;
-width: 120px;
-height: 35px;
-left: 392px;
-top: 635px;
-
-}
-
-
-button[type = newu]{
-  
-  position: absolute;
-  width: 120px;
-  height: 35px;
-  left: 200px;
-  top: 635px;
-
-}
-
-Add Zoom Animation 
-.animate {
-  -webkit-animation: animatezoom 0.6s;
-  animation: animatezoom 0.6s
+  .input-rows {
+    margin-top: 30px;
+  }
 }
