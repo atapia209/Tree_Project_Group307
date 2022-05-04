@@ -39,7 +39,7 @@ body {
   justify-content: space-evenly;
 }
 
-#uploaded-files {
+.no-display {
   display: none;
 }
 
