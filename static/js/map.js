@@ -52,9 +52,12 @@ function makeTable(jsonInput) {
 function makeTree(tree) {
   let newTree = document.createElement("div");
   newTree.classList.add("tree");
+  let treeText = document.createElement("div");
+  treeText.classList.add("tree-text");
   // newTree.innerText = tree.id + ": (" + tree.column + ", " + tree.row + ")\n" + tree.confidence;
-  newTree.innerText = `(${tree.column}, ${tree.row})`
+  treeText.innerText = `(${tree.column}, ${tree.row})`
   
+  newTree.appendChild(treeText);
   return newTree;
 }
 
