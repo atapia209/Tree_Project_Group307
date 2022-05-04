@@ -1,33 +1,17 @@
 // API Calls to display from database
 const request = new XMLHttpRequest();
-const url = 'http://localhost:5000/trees';
-
-let text = document.getElementById("name of textbox");
+// const url = 'http://localhost:5000/trees';
+const url = "http://127.0.0.1:5000/trees"
 
 function data_get() {
-
   request.open('GET', url);
   request.send();
 
-  request.onload = () => text.innerText = request.responseText;
-}
-
-// We'd fill cols/rows from the database
-let rows, cols, container;
-
-function setup(jsonInput) {
-  rows = 5;
-  cols = 5;
-  jsonInput.sort(function(a, b) {
-    if(a.Geometry.BoundingBox.Top == b.Geometry.BoundingBox.Top) {
-      return a.Geometry.BoundingBox.Left - b.Geometry.BoundingBox.Left;
-    } else {
-      return a.Geometry.BoundingBox.Top - b.Geometry.BoundingBox.Top;
-    }
-  });
-  container = document.getElementById("container");
-  draw();
-  makeTable(jsonInput);
+  request.onload = () => {
+    let requested_data = JSON.parse(request.responseText);
+    makeTable(requested_data);
+    makeMap(requested_data);
+  }
 }
 
 function makeTable(jsonInput) {
@@ -44,15 +28,15 @@ function makeTable(jsonInput) {
 
     let row = document.createElement("td");
     row.classList.add("dashboard-table-elem");
-    row.innerText = Math.floor(count / cols); // TODO make this read the individual row lenghts instead of the total # of columns
+    row.innerText = element.row;
 
     let column = document.createElement("td");
     column.classList.add("dashboard-table-elem");
-    column.innerText = count % cols;
+    column.innerText = element.column;
 
     let confidence = document.createElement("td");
     confidence.classList.add("dashboard-table-elem");
-    confidence.innerText = element.Confidence.toFixed(3) + "%";
+    confidence.innerText = element.confidence.toFixed(3) + "%";
 
 
     tr.appendChild(countElement);
@@ -65,81 +49,57 @@ function makeTable(jsonInput) {
 
 }
 
-function makeTree(i, j) {
+function makeTree(tree) {
   let newTree = document.createElement("div");
   newTree.classList.add("tree");
-  newTree.innerHTML = "(" + j + ", " + i + ")";
+  // newTree.innerText = tree.id + ": (" + tree.column + ", " + tree.row + ")\n" + tree.confidence;
+  newTree.innerText = `(${tree.column}, ${tree.row})`
   
   return newTree;
 }
 
-function draw() {
-  container.textContent = "";
-  for(let i = 0; i < rows; i++) {
-    let newRow = document.createElement("div");
-    newRow.classList.add("tree-row");
-    for(let j = 0; j < cols; j++) {
-      let newCol = document.createElement("div");
-      newCol.classList.add("tree-wrapper");
-
-      let newTree = makeTree(i, j);
-      
-      newCol.appendChild(newTree);
-      newRow.appendChild(newCol);
+function makeMap(jsonInput) {
+  let container = document.getElementById("container");
+  // deep copies it so we can sort without altering original array at all
+  let trees = jsonInput.slice();
+  // sort so elements in same row are consecutive, rows are grouped in ascending order, and within the row columns are ascending as well
+  trees.sort((a, b) => {
+    if(a.row == b.row) {
+      return a.column - b.column;
+    } else {
+      return a.row - b.row;
     }
-    container.appendChild(newRow);
-  }
-}
+  });
+  // clear the inside of container just in case, ensures we don't stack multiple maps
+  container.textContent = "";
+  // start currentRow empty and with lastRow set to same as first tree
+  let currentRow = document.createElement("div");
+  currentRow.classList.add("tree-row");
+  let lastRow = trees[0].row;
 
+  trees.forEach(tree => {
+    // if it's a new row
+    if(tree.row != lastRow) {
+      // append the current row
+      container.appendChild(currentRow);
+      // make a new row
+      currentRow = document.createElement("div");
+      currentRow.classList.add("tree-row");
+    }
+    let newCol = document.createElement("div");
+    newCol.classList.add("tree-wrapper");
 
-function updateSize() {
-  rows = document.getElementById("row-input").valueAsNumber;
-  cols = document.getElementById("col-input").valueAsNumber;
-  draw();
-}
-
-window.onload = function() {
-  let testInput = [
-    {"Geometry": {
-        "BoundingBox": {
-          "Left": 0,
-          "Top": 0,
-          "Width": 10,
-          "Height": 8
-        }
-      }, "Confidence": 87.82499694824219
-    }, {
-      "Geometry": {
-        "BoundingBox": {
-          "Left": 10,
-          "Top": 15,
-          "Width": 5,
-          "Height": 9
-        }
-      }, "Confidence": 86.03299713134766
-    }, {
-      "Geometry": {
-        "BoundingBox": {
-          "Left": 20,
-          "Top": 3,
-          "Width": 4,
-          "Height": 16
-        }
-      }, "Confidence": 82.15799713134766
-    }, {
-      "Geometry": {
-        "BoundingBox": {
-          "Left": 2,
-          "Top": 20,
-          "Width": 10,
-          "Height": 10
-        }
-      }, "Confidence": 82.6259994506836
-    }];
- 
-
+    let newTree = makeTree(tree);
     
-  console.log("Loaded");
-  console.log(testInput);
-  setup(testInput);
+    newCol.appendChild(newTree);
+    currentRow.appendChild(newCol);
+  });
+  // once we're done, there's a hanging currentRow, append that to container as well
+  container.appendChild(currentRow);
+}
+
+// wait till window is loaded to run this function, that way when things need to use elements on the page we can be sure
+// they're already loaded
+window.onload = function() {
+  data_get();
 }
