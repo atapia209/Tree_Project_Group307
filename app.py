@@ -1,11 +1,15 @@
 import os
+import time
 
-from flask import Flask, jsonify, redirect, render_template, request, url_for
+from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
 from flask_bcrypt import Bcrypt
 from flask_login import (LoginManager, UserMixin, current_user, login_required, login_user, logout_user)
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
+from werkzeug.utils import secure_filename
 from wtforms import PasswordField, StringField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 
@@ -38,6 +42,20 @@ bcrypt = Bcrypt(app)
 # Initialize marshmallow
 ma = Marshmallow(app)
 
+# Initialze file upload
+upload_folder = os.path.join(maindir, 'uploads')
+allowed_extensions = {'mp4'}
+
+if not os.path.exists(upload_folder):
+    os.mkdir(upload_folder)
+
+app.config['UPLOAD_FOLDER'] = upload_folder
+
+# file upload validation
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in allowed_extensions
+
 # Login
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -52,23 +70,6 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(32), nullable=False)
-
-class RegisterForm(FlaskForm):
-    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=15)])
-    password = PasswordField('Password', validators=[InputRequired(), Length(min=4, max=15)])
-
-    submit = SubmitField('Sign Up')
-
-    def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
-        if user:
-            raise ValidationError('Username already exists')
-
-class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=15)])
-    password = PasswordField('Password', validators=[InputRequired(), Length(min=4, max=15)])
-
-    submit = SubmitField('Sign In')
 
 # Tree Main Model
 class Tree(db.Model):
@@ -90,11 +91,61 @@ class TreeSchema(ma.Schema):
 tree_schema = TreeSchema()
 trees_schema = TreeSchema(many=True)
 
+# File Main Model
+class File(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    filename = db.Column(db.String(30), nullable=False, unique=False)
+
+    def __init__(self, filename):
+        self.filename = filename + time.strftime("%y%m%d%H%M%S")
+
+# File Schema
+class FileSchema(ma.Schema):
+    class Meta:
+        fields = ('id','filename')
+
+file_schema = FileSchema()
+files_schema = FileSchema(many=True)
+
+# admin model view
+class MyModelView(ModelView):
+
+    can_export = True
+
+    def is_accessible(self):
+        return current_user.is_authenticated
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('login'))
+
+# Admin
+admin = Admin(app, name='Admin', template_mode='bootstrap3')
+admin.add_view(MyModelView(User, db.session, name='Users'))
+admin.add_view(MyModelView(Tree, db.session, name='Tree'))
+admin.add_view(MyModelView(File, db.session, name='Files'))
+
+class RegisterForm(FlaskForm):
+    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=15)])
+    password = PasswordField('Password', validators=[InputRequired(), Length(min=4, max=15)])
+
+    submit = SubmitField('Sign Up')
+
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user:
+            raise ValidationError('Username already exists')
+
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=15)])
+    password = PasswordField('Password', validators=[InputRequired(), Length(min=4, max=15)])
+
+    submit = SubmitField('Sign In')
+
 @app.route('/trees', methods=['POST'])
-def add_tree():
-    row = request.json['row']
-    column = request.json['column']
-    confidence = request.json['confidence']
+def add_tree(row_json, column_json, confidence_json):
+    row = row_json
+    column = column_json
+    confidence = confidence_json
 
     new_tree = Tree(row, column, confidence)
 
@@ -154,9 +205,63 @@ def register():
 
     return render_template('login-1.html', form=form)
 
-@app.route('/upload', methods=['GET', 'POST'])
+@app.route('/upload', methods=['GET', 'POST', 'DELETE'])
 @login_required
 def upload():
+
+    if request.method == 'POST':
+        
+        if 'files[]' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+
+        files = request.files.getlist('files[]')
+
+        # if user selects incorrect file type
+        if files[0].filename.split('.')[1] != 'mp4':
+            flash('Incorrect file type')
+        
+        # if user selects a file that already exists
+        # if File.query.filter_by(filename=files[0].filename).first():
+        #     flash('File already exists')
+        #     return redirect(request.url)
+
+        for file in files:
+            print(files[0].filename)
+            print(files[1].filename)
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                Detect_trees_in_video(filename)
+
+                # Add file to database
+                new_file = File(filename)
+                db.session.add(new_file)
+                db.session.commit()
+
+            flash('File(s) uploaded successfully')
+        return redirect(url_for('upload'))
+
+    return render_template('upload.html')
+
+
+    # delete all files
+    if request.method == 'DELETE':
+        for file in files:
+            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
+            db.session.delete(file)
+            db.session.commit()
+        flash('File(s) deleted successfully')
+        return redirect(url_for('upload'))    
+
+    return render_template('upload.html')
+
+    # get all files
+    if request.method == 'GET':
+        all_files = File.query.all()
+        result = files_schema.dump(all_files)
+        return jsonify(result)
+
     return render_template('upload.html')
 
 @app.route('/load')
@@ -171,8 +276,25 @@ def dashboard():
     return render_template('dashboard.html')
 
 @app.route('/scan_first_video/')
-def scan_first_video():
-    Detect_trees_in_video("Tree_vid_1.mp4")
+def scan_first_video(): 
+    #files is array/list
+    #file is individual file
+
+    files = request.files.getlist('files[]')
+
+    # for file in files:
+    #     #filename = 
+    #     Detect_trees_in_video(file.filename)
+    # #Detect_trees_in_video("Tree_vid_1.mp4")
+
+    #list = os.listdir("C:/Users/alann/.vscode/Python_Workspace\Python/Tree_Final/uploads") # dir is your directory path
+    #number_files = len(list)
+    
+
+    #for i in range(number_files):
+        #Detect_trees_in_video(f"./uploads/{i+1}.mp4")
+        
+        
     return redirect(url_for('load'))
 
 @app.route('/scan_second_video/')
@@ -187,51 +309,89 @@ def scan_third_video():
 
 @app.route('/process_json_info/')
 def process_json_info():
-    current_row = 0
-    current_tree_count = 0
-    #Counts and organizes rows and columns in Tree_Table[], and Trees[]
-    current_row,current_tree_count = json_process("Tree_vid_1.mp4.json",current_row,current_tree_count)
-    current_row,current_tree_count = json_process("Tree_vid_2.mp4.json",current_row,current_tree_count)
-    current_row,current_tree_count = json_process("Tree_vid_3.mp4.json",current_row,current_tree_count)
-    #Resets tree count in order to rename images 0-41 again
-    #current_tree_count = 0
-    #current_tree_count = Draw_BB_on_Images_N_Save("Tree_vid_1.mp4", "Tree_vid_1.mp4.json",current_tree_count)
-    #current_tree_count = Draw_BB_on_Images_N_Save("Tree_vid_2.mp4", "Tree_vid_2.mp4.json",current_tree_count)
-    #current_tree_count = Draw_BB_on_Images_N_Save("Tree_vid_3.mp4", "Tree_vid_3.mp4.json",current_tree_count)
-
+    # current_row = 0
+    # current_tree_count = 0
+    # #Counts and organizes rows and columns in Tree_Table[], and Trees[]
+    # #current_row,current_tree_count = json_process("Tree_vid_1.mp4.json",current_row,current_tree_count)
+    # #current_row,current_tree_count = json_process("Tree_vid_2.mp4.json",current_row,current_tree_count)
+    # #current_row,current_tree_count = json_process("Tree_vid_3.mp4.json",current_row,current_tree_count)
+    # #for i in range()
+    # list = os.listdir("C:/Users/alann/.vscode/Python_Workspace\Python/Tree_Final/uploads") # dir is your directory path
+    # number_files = len(list)
+    # for i in range(number_files):
+    #     #Detect_trees_in_video(f"./uploads/{i+1}.mp4")
+    #     current_row,current_tree_count = json_process(f"./uploads/{i+1}.mp4.json",current_row,current_tree_count)
+    json_process()
+    adding_tree_final_draft()
     return redirect(url_for('load'))
 
 @app.route('/Display_Tree_Table/')
 def Display_Tree_Table():
     Print_Tree_Table()
     return redirect(url_for('load'))
-#################################################################################
+##########################################################################################################################
 #Definitions
 
-def json_process(json_file_name,current_row,current_tree_count):
-    json_file = open(json_file_name)
-    data = json.loads(json_file.read())
-    count = 0
-    current_confidence = 0
-    for index, sub_data in enumerate(data):
-        #print("index:" , index, "Stuff inside sub_data: ", sub_data, "\nType:", sub_data['Name'])
-        Trees.append([current_tree_count + index, sub_data['Name'], sub_data['Confidence'], sub_data['Geometry']])
-        count +=1
-    print('There were', count, " trees detected in row: ", current_row," in Video: ",  json_file_name)
-    Tree_table_list.append([current_row,count])
-    #Tree_table_list.append(count)
-    return current_row + 1, current_tree_count + count
+def json_process():
+    # json_file = open(json_file_name)
+    # data = json.loads(json_file.read())
+    # count = 0
+    # current_confidence = 0
+    # for index, sub_data in enumerate(data):
+    #     #print("index:" , index, "Stuff inside sub_data: ", sub_data, "\nType:", sub_data['Name'])
+    #     Trees.append([current_tree_count + index, sub_data['Name'], sub_data['Confidence'], sub_data['Geometry']])
+    #     count +=1
+    # print('There were', count, " trees detected in row: ", current_row," in Video: ",  json_file_name)
+    # Tree_table_list.append([count])
+    # #Tree_table_list.append(count)
+
+    list = os.listdir("C:/Users/alann/.vscode/Python_Workspace\Python/Tree_Final/uploads") # dir is your directory path
+    number_files = len(list)
+    for i in range(number_files):
+        #Detect_trees_in_video(f"./uploads/{i+1}.mp4")
+        #current_row,current_tree_count = json_process(f"./uploads/{i+1}.mp4.json",current_row,current_tree_count)
+
+        json_file = open(f"{i+1}.mp4.json")
+        data = json.loads(json_file.read())
+
+        count = len(data)
+        temp = 0
+
+        for index, sub_data in enumerate(data):
+            #print( "Label: " , data[count]['Name'])
+            #print("Confidence: ", data[count]['Confidence'])
+            if index == 0:
+                Trees.append([data[index]['Name'], data[index]['Confidence'], data[index]['Geometry']['BoundingBox'], data[index]['Timestamp']])
+            elif index > 0 and index < count:
+                #print(data[index]['Timestamp'], " - ",data[index-1]['Timestamp'], " == " , data[index]['Timestamp'] - data[index-1]['Timestamp'])
+                if data[index]['Timestamp'] - data[index-1]['Timestamp'] == 1000:
+                    print("Will not be adding this tree, these trees are two close together")
+                else:
+                    Trees.append([data[index]['Name'], data[index]['Confidence'], data[index]['Geometry']['BoundingBox'], data[index]['Timestamp']])
+                    temp = temp + 1
+
+        print("Done with ",f"{i+1}.mp4.json", "| temp:", temp)   
+        Tree_table_list.append(temp +1)
+
+def adding_tree_final_draft():
+    total_index = 0
+    for i, row_length in enumerate(Tree_table_list):
+        for j in range(row_length):
+            add_tree(i,j,Trees[j + total_index][1])
+        total_index += row_length
+
 
 def Print_Tree_Table():
     for i in range(len(Tree_table_list)):
-        print("Current Row:", Tree_table_list[i][0], "| Number of Trees in Row:",Tree_table_list[i][1])
-    print(Tree_table_list)
+        print("Current Row:", i, "| Number of Trees in Row:",Tree_table_list[i])
+    # print(Tree_table_list)
     for i in range(len(Trees)):
-        print(" Tree Index:", Trees[i][0], "| Type: ",Trees[i][1],"| Confidence: ", Trees[i][2])
+        print("Tree Index: ", i, "| Type:", Trees[i][0], "| Confidence: ",Trees[i][1],"| Geometry: ", Trees[i][2], "|Timestamp: ", Trees[i][3])
         #also has Gemotry for bounding boxes saved in [i][3] = 'Geomtry' but user doesn't need to 
         #see that
 
 def Detect_trees_in_video(video_name):
+
     videoFile = video_name
     projectVersionArn = "arn:aws:rekognition:us-east-2:520310994707:project/Tree_Detect_v5/version/Tree_Detect_v5.2022-04-16T07.46.59/1650120417223"
     rekognition = boto3.client('rekognition')        
@@ -261,7 +421,9 @@ def Detect_trees_in_video(video_name):
     
     print(customLabels)
 
-    with open(videoFile + ".json", "w") as f:
+    newjson_name = (video_name + ".json")
+
+    with open(newjson_name, "w") as f:
         f.write(json.dumps(customLabels)) 
 
     cap.release()
