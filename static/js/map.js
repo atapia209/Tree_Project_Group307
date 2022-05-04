@@ -1,3 +1,17 @@
+// API Calls to display from database
+const request = new XMLHttpRequest();
+const url = 'http://localhost:5000/trees';
+
+let text = document.getElementById("name of textbox");
+
+function data_get() {
+
+  request.open('GET', url);
+  request.send();
+
+  request.onload = () => text.innerText = request.responseText;
+}
+
 // We'd fill cols/rows from the database
 let rows, cols, container;
 
