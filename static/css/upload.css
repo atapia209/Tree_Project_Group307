@@ -107,3 +107,12 @@ body {
 .logout:hover {
   background-color: #a4a4a4;
 }
+
+.left>.side-content-wrapper:hover {
+  border-radius: 10px;
+  background-color: rgba(255, 183, 0, 0.3)
+}
+
+.left>.side-content-wrapper {
+  padding: 10px;
+}
