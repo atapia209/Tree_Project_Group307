@@ -1,9 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nursery Web App</title>
+    <link rel="shortcut icon" href="../static/images/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    
 
-<!doctype html>
-<html>
-<link rel="stylesheet" href="/static/css/load.css">
-
-<body> 
     <h2>This web application is for the detection,classification, and storage of trees</h2>
 
     <button type="mp4">Upload .MP4</button>
@@ -14,18 +20,15 @@
         <input type="submit" value="Scan First Video Here" />
     </form>
     
-     <button> <a href="/scan_second_video/">Scan Second Video Here</a></button>
+    <button><a href="/scan_second_video/">Scan Second Video Here</a></button>
 
-     <button> <a href="/scan_third_video/">Scan Third Video Here</a></button>
+    <button><a href="/scan_third_video/">Scan Third Video Here</a></button>
 
-     <button> <a href="/process_json_info/">Process ALL JSON Information Here</a></button>
+    <button><a href="/process_json_info/">Process ALL JSON Information Here</a></button>
 
-     <button> <a href="/Display_Tree_Table/">Display Tree Table in Terminal Here</a></button>
+    <button><a href="/Display_Tree_Table/">Display Tree Table in Terminal Here</a></button>
     
     <a href="{{url_for('logout')}}">Logout</a>
     <a href="{{url_for('dashboard')}}">Dashboard</a>
 </body>
-
-
-
 </html>

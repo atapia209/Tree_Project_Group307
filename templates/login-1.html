@@ -1,43 +1,46 @@
-<!doctype html>
-
-<link rel="stylesheet" href="/static/css/login-1.css">  
-<!-- Button to open the modal login form -->
-
-
-<!-- The Modal -->
-<h1>Nursery Web App</h1>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nursery Web App</title>
+  <link rel="shortcut icon" href="../static/images/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="/static/css/login-1.css">
+</head>
 <body>
-<!--First Name-->
-    <div class="container">
+    <h1>Nursery Web App</h1>
 
-        <label for="fname"><b>First Name </b></label>
-        <input type="text" placeholder="Enter First Name" name="fname" required>
-  
+  <!--First Name-->
+  <div class="container">
+    <label for="fname"><b>First Name </b></label>
+    <input type="text" placeholder="Enter First Name" name="fname" required>
+
     <!--Last Name-->
-        <label for="lname"><b>Last Name</b></label>
-        <input type="text" placeholder="Enter Last Name" name="lname" required>
-  
-     <!--Username -->
-      <label for="uname"><b>New Username</b></label>
-      <input type="text" placeholder="Enter Username" name="uname" required>
+    <label for="lname"><b>Last Name</b></label>
+    <input type="text" placeholder="Enter Last Name" name="lname" required>
+
+    <!--Username -->
+    <label for="uname"><b>New Username</b></label>
+    <input type="text" placeholder="Enter Username" name="uname" required>
 
     <!--Password Line-->
-      <label for="psw"><b>New Password</b></label>
-      <input type="password" placeholder="Enter Password" name="psw" required>
+    <label for="psw"><b>New Password</b></label>
+    <input type="password" placeholder="Enter Password" name="psw" required>
+
+    <!--Login button-->
+    <!--<button type="con"> <a href="upload.html">Continue</a></button>-->
+
+  </div>
+
+  <div>
+    <form method="post" action="">
+      {{form.hidden_tag()}}
+      {{form.username}}
+      {{form.password}}
+      {{form.submit}}
+  </div>
 
 
-      <!--Login button-->
-      <!--<button type="con"> <a href="upload.html">Continue</a></button>-->
-
-    </div>
-
-    <div>
-      <form method="post" action="">
-        {{form.hidden_tag()}}
-        {{form.username}}
-        {{form.password}}
-        {{form.submit}}
-    </div>
-
-</body>  
+</body>
+</html>
