@@ -123,6 +123,6 @@
   justify-content: center;
 }
 
-.tree-text {
-  color: #0000FF;
+.hide {
+  visibility: hidden;
 }

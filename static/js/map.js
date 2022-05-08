@@ -9,14 +9,24 @@ function data_get() {
 
   request.onload = () => {
     let requested_data = JSON.parse(request.responseText);
+    
     makeTable(requested_data);
+    
     makeMap(requested_data);
   }
 }
 
 function makeTable(jsonInput) {
   let table = document.querySelector(".dashboard-table");
+
+  // first make sure there's only one element in the table, the header row
+  while(table.childElementCount > 1) {
+    table.removeChild(table.lastChild);
+  }
+
+
   let count = 1;
+  let longestColumn = 0;
   jsonInput.forEach(element => {
     let tr = document.createElement("tr");
     tr.classList.add("dashboard-table-row");
@@ -49,7 +59,21 @@ function makeTable(jsonInput) {
 
 }
 
+function fillRow(row, longestRow) {
+  let rowLength = row.childElementCount;
+  console.log(rowLength, longestRow);
+  while(rowLength < longestRow) {
+    let tree = makeTree({"column":0,"row":0});
+    tree.classList.add("hide");
+    row.appendChild(tree);
+    rowLength++;
+  }
+}
+
 function makeTree(tree) {
+  let wrapper = document.createElement("div");
+  wrapper.classList.add("tree-wrapper");
+
   let newTree = document.createElement("div");
   newTree.classList.add("tree");
   let treeText = document.createElement("div");
@@ -58,46 +82,54 @@ function makeTree(tree) {
   treeText.innerText = `(${tree.column}, ${tree.row})`
   
   newTree.appendChild(treeText);
-  return newTree;
+  wrapper.appendChild(newTree);
+  return wrapper;
 }
 
 function makeMap(jsonInput) {
   let container = document.getElementById("container");
+
   // deep copies it so we can sort without altering original array at all
   let trees = jsonInput.slice();
+
+  // Find longest row, useful for sorting and for making the display
+  let longestRow = 0;
+  trees.forEach(tree => {
+    if(tree.column > longestRow)
+      longestRow = tree.column
+    }
+  );
+  console.log(longestRow);
   // sort so elements in same row are consecutive, rows are grouped in ascending order, and within the row columns are ascending as well
   trees.sort((a, b) => {
-    if(a.row == b.row) {
-      return a.column - b.column;
-    } else {
-      return a.row - b.row;
-    }
+    return (a.row * longestRow + a.column) - (b.row * longestRow + b.column);
   });
+  console.log(trees);
   // clear the inside of container just in case, ensures we don't stack multiple maps
   container.textContent = "";
   // start currentRow empty and with lastRow set to same as first tree
   let currentRow = document.createElement("div");
   currentRow.classList.add("tree-row");
-  let lastRow = trees[0].row;
+  let lastRowNumber = trees[0].row;
 
   trees.forEach(tree => {
     // if it's a new row
-    if(tree.row != lastRow) {
+    if(tree.row != lastRowNumber) {
+      fillRow(currentRow, longestRow);
       // append the current row
       container.appendChild(currentRow);
       // make a new row
       currentRow = document.createElement("div");
       currentRow.classList.add("tree-row");
+      lastRowNumber = tree.row;
     }
-    let newCol = document.createElement("div");
-    newCol.classList.add("tree-wrapper");
-
-    let newTree = makeTree(tree);
     
-    newCol.appendChild(newTree);
-    currentRow.appendChild(newCol);
+    let newTree = makeTree(tree);
+
+    currentRow.appendChild(newTree);
   });
   // once we're done, there's a hanging currentRow, append that to container as well
+  fillRow(currentRow, longestRow);
   container.appendChild(currentRow);
 }
 
