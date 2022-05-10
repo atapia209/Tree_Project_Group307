@@ -87,6 +87,9 @@ function makeTree(tree) {
 }
 
 function makeMap(jsonInput) {
+  document.querySelector("h2.map-title").innerText += ", Total Tree Count: " + jsonInput.length;
+  console.log(jsonInput);
+
   let container = document.getElementById("container");
 
   // deep copies it so we can sort without altering original array at all
