@@ -1,0 +1,52 @@
+
+<!doctype html>
+
+<html>
+    <link rel="stylesheet" href="/static/css/upload.css">
+
+    <body> 
+
+        <h1>Nursery Web App</h1>
+
+        <div id="uploaded-files">
+            <h2>Select .mp4 file(s) to upload</h2>
+            <p>
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                <ul class="flashes">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                    {% endif %}
+                {% endwith %}
+            </p>
+
+            <form method="post" action="/upload" enctype="multipart/form-data">
+                <dl>
+                    <p>
+                        <input type="file" name="files[]" multiple="true"
+                        autocomplete="off" required>
+                    </p>
+                </dl>
+                <p>
+                    <input type="submit" value="Submit">
+                </p>
+            </form>
+
+            <div>
+                <h2>Uploaded Files</h2>
+                <ul>
+                    {% for file in files %}
+                        <li>{{ file }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+        </div>
+
+        <a href="{{url_for('logout')}}">Logout</a>
+
+    </body>
+
+</html>

@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+
+<link rel="stylesheet" href="/static/css/login.css">  
+<!-- Button to open the modal login form -->
+
+
+
+
+<body>
+  <div class="left">
+    <div class="title-wrapper">
+      <h1 class="title">Nursery Web App</h1>
+      <img class="logo" src="static/images/Logo.png" alt="">
+    </div>
+  
+
+    <form class="input-boxes" method="post" action="">
+      {{form.hidden_tag()}}
+
+      <!--Username Line-->
+      <div class="input-rows">
+        <label for="uname"><b>User :</b></label>
+        {{ form.username(class_="user login-boxes") }}
+      </div>
+      
+      <!--Password Line-->
+      <div class="input-rows">
+        <label for="psw"><b>Password :</b></label>
+        {{form.password(class_="psw login-boxes")}}
+      </div>
+
+      
+
+        {{form.submit(class_="login input-rows")}}
+        <label>
+          <input for = "member" type="checkbox" checked="checked" name="remember"> Remember me
+        </label>
+    </form>
+
+    <a class="new-user" href="{{url_for('register')}}">New User</a>
+  </div>
+
+      
+
+    
+
+
+
+</body>
+</html>

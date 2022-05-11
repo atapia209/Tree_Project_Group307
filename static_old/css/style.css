@@ -1,0 +1,117 @@
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.back-button {
+  background-color:#d3d3d3;
+  border: none;
+  border-radius: 50%;
+  color: #000000;
+  text-decoration: none;
+  height: 3em;
+  padding-top: 1.5em;
+  width: 6em;
+  font-size: 1em;
+  text-align: center;
+}
+
+.back-button:hover {
+  background-color: #a4a4a4;
+}
+
+.tree-logo {
+ height:75px;
+ width:75px;
+}
+
+.title {
+  float: left;
+  text-align: center;
+}
+.dashboard-wrapper {
+  margin: auto;
+  display: flex;
+  justify-content: space-evenly;
+  flex-direction: row;
+}
+.dashboard-table {
+  border: 1px solid #000000;
+  border-collapse: collapse;
+  width: 40vw;
+}
+.dashboard-table-row {
+  height: 3em;
+}
+.dashboard-table-row:nth-child(even) {
+  background-color: lightgreen;
+}
+.dashboard-table-row:nth-child(1){
+  background-color: #d3d3d3;
+}
+
+
+.map-wrapper {
+  width: 40vw;
+}
+.map-title-wrapper {
+  border: 1px solid #000000;
+  background-color: #d3d3d3;
+  padding-left: 2em;
+}
+.map-container { 
+  /* height: 520px; */
+  border:1px solid #000000;
+} 
+
+.dashboard-table-header {
+  border: 1px solid #000000;
+  border-collapse: collapse;
+  font-size: 2em;
+}
+
+.dashboard-table-elem {
+  border: 1px solid #000000;
+  border-collapse: collapse;
+  font-size: 1em;
+  padding-left: 1em;
+}
+
+
+
+#container { 
+  padding: 5px;
+  
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: space-evenly;
+}
+
+.tree-row {
+/*   background-color: blue; */
+  margin: 5px;
+  
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+}
+
+
+.tree-wrapper {
+/*   background-color: green; */
+  margin: 10px;
+  
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: center;
+}
+
+.tree {
+/*  We'd probably dynamically define the height/width just hard coded it here  */
+  width: 50px;
+  height: 50px;
+  background-color: brown;
+}
