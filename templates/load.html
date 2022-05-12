@@ -1,0 +1,31 @@
+
+<!doctype html>
+<html>
+<link rel="stylesheet" href="/static/css/load.css">
+
+<body> 
+    <h2>This web application is for the detection,classification, and storage of trees</h2>
+
+    <button type="mp4">Upload .MP4</button>
+
+    <button type="jpg">Upload .JPG</button>
+
+    <form action="/scan_first_video/">
+        <input type="submit" value="Scan First Video Here" />
+    </form>
+    
+     <button> <a href="/scan_second_video/">Scan Second Video Here</a></button>
+
+     <button> <a href="/scan_third_video/">delete all trees</a></button>
+
+     <button> <a href="/process_json_info/">Process ALL JSON Information Here</a></button>
+
+     <button> <a href="/Display_Tree_Table/">Display Tree Table in Terminal Here</a></button>
+    
+    <a href="{{url_for('logout')}}">Logout</a>
+    <a href="{{url_for('dashboard')}}">Dashboard</a>
+</body>
+
+
+
+</html>

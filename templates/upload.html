@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nursery Web App</title>
+    <link rel="stylesheet" href="/static/css/upload.css">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="filler"></div>
+        <h1 class="title">Nursery Web App</h1>
+        <a href="../admin">
+            <img class="tree-logo" src="../static/images/Logo.png" alt="tree">
+        </a>
+    </div>
+    <div class="wrapper">
+        <div class="left sides">
+            <div id="create-new-project" class="create-new-project-wrapper side-content-wrapper">
+                <img class="left-action-image" src="../static/images/Upload.png" alt="Upload">
+                <div class="left-action-text">
+                    <h2>Create a New Project</h2>
+                    <p>Create a new virtual farm</p>
+                </div>
+            </div>
+            <div class="open-project-wrapper side-content-wrapper">
+                <img class="left-action-image" src="../static/images/Folder.png" alt="Folder opening">
+                <div class="left-action-text">
+                    <h2>Load Existing File</h2>
+                    <p>Open an existing farm</p>
+                </div>
+            </div>
+        </div>
+        <div class="middle"></div>
+        <div class="right sides">
+            <div>
+                <div class="farm-wrapper side-content-wrapper">
+                    <img src="../static/images/File.png" alt="Farm file" class="right-file-image">
+                    <div class="right-farm-text">
+                        <h3>Xavier's Farm</h3>
+                        <p>~ 03-10-22 11:29MB</p>
+                    </div>
+                </div>
+                <div class="farm-wrapper side-content-wrapper">
+                    <img src="../static/images/File.png" alt="Farm file" class="right-file-image">
+                    <div class="right-farm-text">
+                        <h3>Leo's Farm</h3>
+                        <p>~ 03-10-22 11:29MB</p>
+                    </div>
+                </div>
+                <div class="farm-wrapper side-content-wrapper">
+                    <img src="../static/images/File.png" alt="Farm file" class="right-file-image">
+                    <div class="right-farm-text">
+                        <h3>Alann's Farm</h3>
+                        <p>~ 03-10-22 11:29MB</p>
+                    </div>
+                </div>
+            </div>
+            <div class="no-display" id="uploaded-files">
+                <h2>Select .mp4 file(s) to upload</h2>
+                <p class="errors">
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                    <ul class="flashes">
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                        {% endif %}
+                    {% endwith %}
+                </p>
+                <form method="post" action="/upload" enctype="multipart/form-data">
+                    <dl>
+                        <p>
+                            <input type="file" name="files[]" multiple="true"
+                            autocomplete="off" required>
+                        </p>
+                    </dl>
+                    <p>
+                        <input type="submit" value="Submit">
+                    </p>
+                </form>
+
+                <div>
+                    <button> <a href="/process_json_info/">Process</a></button>
+                    <h2>Uploaded Files</h2>
+                    <ul>
+                        {% for file in files %}
+                            <li>{{ file }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="bottom">
+        <div class="logout-wrapper">
+            <a class="logout" href="{{url_for('logout')}}">Logout</a>
+        </div>  
+        
+    </div>
+
+    
+
+
+
+
+
+
+
+</div>
+</body>
+
+<script src="../static/js/upload.js"></script>
+</html>

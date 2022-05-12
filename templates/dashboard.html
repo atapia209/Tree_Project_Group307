@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nursery Web App</title>
+    <link rel="shortcut icon" href="../static/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+
+
+<body>
+  <div class="header">
+    <a href="../upload" class="back-button">
+      BACK
+    </a>
+    <h1 class="title">Nursery Web App</h1>
+    <a href="../admin">
+      <img class="tree-logo" src="../static/images/Logo.png" alt="tree">
+    </a>
+  </div>
+  
+  <div class="dashboard-wrapper">
+    <table class="dashboard-table">
+      <tr class="dashboard-table-row">
+        <th class="dashboard-table-header">Count</th>
+        <th class="dashboard-table-header">Row</th> 
+        <th class="dashboard-table-header">Column</th>
+        <th class="dashboard-table-header">Confidence</th>
+      </tr>
+      
+    </table>
+    <div class="map-wrapper">
+      <div class="map-title-wrapper">
+        <h2 class="map-title">Gemperle's Farm</h2>
+      </div>
+      <div id="container" class="map-container"></div>
+  
+    </div>
+    
+    <div></div> 
+  </div>
+</body>
+
+
+<script src="/static/js/map.js"></script>
+</html>
